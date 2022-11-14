@@ -8,11 +8,16 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.example.flickr.Objects.Photo
 import com.example.flickr.ViewModels.FlickerFragmentViewModel
 import com.example.flickr.databinding.FragmentFlickrBinding
+import kotlinx.coroutines.launch
 
+//import com.squareup.picasso.Picasso;
 class FlikrFragment : Fragment() {
     lateinit var binding : FragmentFlickrBinding
     lateinit var viewModel :FlickerFragmentViewModel
@@ -24,6 +29,17 @@ class FlikrFragment : Fragment() {
         var v = inflater.inflate(R.layout.fragment_flickr,container,false)
         binding = FragmentFlickrBinding.bind(v)
         viewModel = FlickerFragmentViewModel()
+        binding.apply {
+            var samples = ArrayList<Photo>()
+            samples.add(Photo("https://w7.pngwing.com/pngs/929/843/png-transparent-lebron-james-jumping-while-holding-basketball-file-formats-lebron-james-image-file-formats-computer-wallpaper-competition-event-thumbnail.png"))
+            var adapter = FlickrAdapter(samples,this@FlikrFragment.requireContext())
+            rv.layoutManager = GridLayoutManager(this@FlikrFragment.requireContext(),3)
+            rv.adapter = adapter
+            adapter.notifyDataSetChanged()
+            lifecycleScope.launch {
+                viewModel.fetchData()
+            }
+        }
         return binding.root
     }
 
@@ -43,7 +59,8 @@ class FlikrFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: FlickrViewHolder, position: Int) {
-
+//            Picasso.load(photos.get(position).imgurl).into(holder.photo_iv)
+            holder.photo_iv.load(photos.get(position).imgurl)
         }
 
         override fun getItemCount(): Int {
