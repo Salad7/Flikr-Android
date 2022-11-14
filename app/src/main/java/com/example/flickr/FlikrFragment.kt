@@ -8,12 +8,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.example.flickr.Objects.Photo
 import com.example.flickr.ViewModels.FlickerFragmentViewModel
 import com.example.flickr.databinding.FragmentFlickrBinding
+import kotlinx.coroutines.launch
+
 //import com.squareup.picasso.Picasso;
 class FlikrFragment : Fragment() {
     lateinit var binding : FragmentFlickrBinding
@@ -33,6 +36,9 @@ class FlikrFragment : Fragment() {
             rv.layoutManager = GridLayoutManager(this@FlikrFragment.requireContext(),3)
             rv.adapter = adapter
             adapter.notifyDataSetChanged()
+            lifecycleScope.launch {
+                viewModel.fetchData()
+            }
         }
         return binding.root
     }
