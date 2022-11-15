@@ -30,15 +30,22 @@ class FlikrFragment : Fragment() {
         binding = FragmentFlickrBinding.bind(v)
         viewModel = FlickerFragmentViewModel()
         binding.apply {
-            var samples = ArrayList<Photo>()
-            samples.add(Photo("https://w7.pngwing.com/pngs/929/843/png-transparent-lebron-james-jumping-while-holding-basketball-file-formats-lebron-james-image-file-formats-computer-wallpaper-competition-event-thumbnail.png"))
-            var adapter = FlickrAdapter(samples,this@FlikrFragment.requireContext())
-            rv.layoutManager = GridLayoutManager(this@FlikrFragment.requireContext(),3)
-            rv.adapter = adapter
-            adapter.notifyDataSetChanged()
+//            var samples = ArrayList<Photo>()
+//            samples.add(Photo("https://w7.pngwing.com/pngs/929/843/png-transparent-lebron-james-jumping-while-holding-basketball-file-formats-lebron-james-image-file-formats-computer-wallpaper-competition-event-thumbnail.png"))
             lifecycleScope.launch {
-                viewModel.fetchData()
+                viewModel.immutableFlickrStateFlow.collect {
+
+                    var adapter =
+                        FlickrAdapter(it.photos.photo, this@FlikrFragment.requireContext())
+                    rv.layoutManager = GridLayoutManager(this@FlikrFragment.requireContext(), 3)
+                    rv.adapter = adapter
+                    adapter.notifyDataSetChanged()
+                }
             }
+
+        }
+        lifecycleScope.launch {
+            viewModel.fetchData()
         }
         return binding.root
     }
@@ -50,7 +57,7 @@ class FlikrFragment : Fragment() {
         }
     }
 
-    class FlickrAdapter(list :ArrayList<Photo>, ctx : Context) : RecyclerView.Adapter<FlickrViewHolder>(){
+    class FlickrAdapter(list :List<Photo>, ctx : Context) : RecyclerView.Adapter<FlickrViewHolder>(){
         var photos = list;
         var context = ctx;
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FlickrViewHolder {
@@ -60,7 +67,7 @@ class FlikrFragment : Fragment() {
 
         override fun onBindViewHolder(holder: FlickrViewHolder, position: Int) {
 //            Picasso.load(photos.get(position).imgurl).into(holder.photo_iv)
-            holder.photo_iv.load(photos.get(position).imgurl)
+            holder.photo_iv.load(photos.get(position).getImageUrl())
         }
 
         override fun getItemCount(): Int {
