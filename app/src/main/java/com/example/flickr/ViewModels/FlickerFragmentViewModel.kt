@@ -23,9 +23,16 @@ class FlickerFragmentViewModel : ViewModel() {
 
     }
 
-    suspend fun fetchData(){
+    suspend fun fetchData() : PhotosRootResponse{
         var api = retrofit.create<FlickrApi>()
         Log.d("FlickerFragmentVM",api.fetchContents().toString())
         flikrMutableStateFlow.value = api.fetchContents()
+        return api.fetchContents()
+    }
+
+    suspend fun fetchByQuery(query :String){
+        var api = retrofit.create<FlickrApi>()
+        Log.d("FlickerFragmentVM",api.fetchByQuery(query).toString())
+        flikrMutableStateFlow.value = api.fetchByQuery(query)
     }
 }
